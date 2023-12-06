@@ -25,17 +25,19 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 fn compute_win_options(time: u64, distance: u64) -> u32 {
-    let mut win_options = 0;
+    let min_distance_to_win = distance + 1;
 
-    for hold_time in 0..=time {
-        let speed = hold_time;
-        let travel_distance = speed * (time - hold_time);
+    let discriminant = ((time.pow(2) - 4 * (min_distance_to_win)) as f64).sqrt();
+    
+    let min_hold_time: f64 = (time as f64 - discriminant) / 2.;
+    let max_hold_time: f64 = (time as f64 + discriminant) / 2.;
 
-        if travel_distance > distance {
-            win_options += 1;
-        }
-    }
-    win_options
+    let min_hold_time = min_hold_time.ceil() as u32;
+    let max_hold_time = max_hold_time.floor() as u32;
+
+    let amount_of_options = max_hold_time - min_hold_time + 1;
+
+    amount_of_options
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
