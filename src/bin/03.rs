@@ -5,7 +5,6 @@ use regex::Regex;
 advent_of_code::solution!(3);
 
 pub fn part_one(input: &str) -> Option<u32> {
-
     let lines = input.lines().collect();
 
     let parts = find_parts(&lines);
@@ -16,7 +15,6 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 fn find_parts(lines: &Vec<&str>) -> Vec<(u32, (i32, (i32, i32)))> {
-
     let find_numbers = Regex::new(r"\d+").expect("Invalid regex");
 
     let mut parts: Vec<(u32, (i32, (i32, i32)))> = Vec::new();
@@ -24,8 +22,6 @@ fn find_parts(lines: &Vec<&str>) -> Vec<(u32, (i32, (i32, i32)))> {
     for (i, line) in lines.iter().enumerate() {
         let i = i as i32;
         for (j_start, substring) in line.match_indices(&find_numbers) {
-            let j_start = j_start;
-
             let j_end = j_start + substring.chars().count();
 
             let scan_start: usize = max(0, (j_start as i32) - 1) as usize;
@@ -33,18 +29,19 @@ fn find_parts(lines: &Vec<&str>) -> Vec<(u32, (i32, (i32, i32)))> {
 
             let mut is_part = false;
 
-            let search_range = ((i-1)..=(i+1)).filter(|i| i >= &0).map(|i| i as usize);
+            let search_range = ((i - 1)..=(i + 1)).filter(|i| i >= &0).map(|i| i as usize);
 
             for neighbor_i in search_range {
                 if let Some(neighbor_line) = lines.get(neighbor_i) {
-                    if neighbor_line[scan_start..scan_end].contains(|c: char| !(c.is_numeric() || c == '.')) {
+                    if neighbor_line[scan_start..scan_end]
+                        .contains(|c: char| !(c.is_numeric() || c == '.'))
+                    {
                         is_part = true;
                     }
                 }
             }
 
             if is_part {
-
                 let value: u32 = substring.parse().expect("Expected to parse the number");
 
                 parts.push((value, (i as i32, (j_start as i32, j_end as i32))));
@@ -56,7 +53,7 @@ fn find_parts(lines: &Vec<&str>) -> Vec<(u32, (i32, (i32, i32)))> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let lines: Vec<&str> = input.lines().collect();
-    
+
     let parts = find_parts(&lines);
 
     let mut gear_ratios = Vec::new();
@@ -70,7 +67,7 @@ pub fn part_two(input: &str) -> Option<u32> {
 
             let mut star_values = Vec::new();
 
-            println!("checking star: {},{}", star_i, star_j);
+            // println!("checking star: {},{}", star_i, star_j);
 
             for (part_value, (part_i, (part_j_start, part_j_end))) in &parts {
                 if star_i + 1 >= *part_i && star_i - 1 <= *part_i {
@@ -80,14 +77,14 @@ pub fn part_two(input: &str) -> Option<u32> {
                 }
             }
 
-            dbg!(&star_values);
+            // dbg!(&star_values);
 
             if star_values.len() == 2 {
                 let gear_ratio: u32 = star_values.iter().copied().product();
 
                 gear_ratios.push(gear_ratio);
 
-                println!("Found gear! {:?} -> {}", &star_values, gear_ratio);
+                // println!("Found gear! {:?} -> {}", &star_values, gear_ratio);
             }
         }
     }

@@ -4,26 +4,26 @@ advent_of_code::solution!(4);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let mut result = 0;
-    
-    for card in input.lines() {
 
+    for card in input.lines() {
         let overlap = compute_winning_amount(&card);
         if overlap >= 1 {
             result += (2 as u32).pow(overlap as u32 - 1);
         }
-    
     }
 
     Some(result)
 }
 
-
 fn compute_winning_amount(card: &str) -> u32 {
     let card = card.split(':').last().expect("invalid card");
 
-    let splitted: Vec<Vec<&str>> = card.split("|").into_iter()
-        .map(|s| s.split_whitespace().collect()).collect();
-    
+    let splitted: Vec<Vec<&str>> = card
+        .split("|")
+        .into_iter()
+        .map(|s| s.split_whitespace().collect())
+        .collect();
+
     let my_numbers = splitted.first().expect("my numbers is None");
     let winning_numbers = splitted.last().expect("winning numbers is None");
 
@@ -41,7 +41,10 @@ fn compute_winning_amount(card: &str) -> u32 {
 pub fn part_two(input: &str) -> Option<u32> {
     let cards: Vec<&str> = input.lines().collect();
 
-    let scores: Vec<u32> = cards.into_iter().map(|card| compute_winning_amount(card)).collect();
+    let scores: Vec<u32> = cards
+        .into_iter()
+        .map(|card| compute_winning_amount(card))
+        .collect();
 
     let mut queue = Vec::new();
 
@@ -49,12 +52,12 @@ pub fn part_two(input: &str) -> Option<u32> {
 
     let mut result = 0;
 
-    while let Some(card_index) = queue.pop()  {
+    while let Some(card_index) = queue.pop() {
         let score = scores[card_index];
 
         result += 1;
 
-        for new_index in (card_index+1)..=(card_index+score as usize) {
+        for new_index in (card_index + 1)..=(card_index + score as usize) {
             if new_index < scores.len() {
                 queue.push(new_index);
             }

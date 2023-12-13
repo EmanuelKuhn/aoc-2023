@@ -3,7 +3,14 @@
 advent_of_code::solution!(9);
 
 pub fn part_one(input: &str) -> Option<i64> {
-    let sequences: Vec<Vec<i64>> = input.lines().map(|s| s.split_ascii_whitespace().map(|s| s.parse().expect("strings should be numbers")).collect()).collect();
+    let sequences: Vec<Vec<i64>> = input
+        .lines()
+        .map(|s| {
+            s.split_ascii_whitespace()
+                .map(|s| s.parse().expect("strings should be numbers"))
+                .collect()
+        })
+        .collect();
 
     let extrapolations: Vec<i64> = sequences.iter().map(|seq| extraplotate(seq)).collect();
 
@@ -21,15 +28,21 @@ fn extraplotate(seq: &Vec<i64>) -> i64 {
 
     differences.push(compute_differences(seq));
 
-    while !differences.last().expect("should have a last").iter().all(|x| *x == 0) {
-        differences.push(compute_differences(differences.last().expect("should have a last")));
+    while !differences
+        .last()
+        .expect("should have a last")
+        .iter()
+        .all(|x| *x == 0)
+    {
+        differences.push(compute_differences(
+            differences.last().expect("should have a last"),
+        ));
     }
 
     differences.last_mut().expect("should have a last").push(0);
 
     for i in (0..differences.len() - 1).rev() {
-        
-        let prev_diff = *differences[i+1].last().unwrap();
+        let prev_diff = *differences[i + 1].last().unwrap();
         let cur_diff = *differences[i].last().unwrap();
 
         (&mut differences[i]).push(cur_diff + prev_diff);
@@ -41,7 +54,10 @@ fn extraplotate(seq: &Vec<i64>) -> i64 {
 }
 
 pub fn part_two(input: &str) -> Option<i64> {
-    let sequences_iter = input.lines().map(|s| s.split_ascii_whitespace().map(|s| s.parse().expect("strings should be numbers")));
+    let sequences_iter = input.lines().map(|s| {
+        s.split_ascii_whitespace()
+            .map(|s| s.parse().expect("strings should be numbers"))
+    });
 
     // Reverse sequence
     let sequences: Vec<Vec<i64>> = sequences_iter.map(|seq| seq.rev().collect()).collect();
@@ -50,7 +66,6 @@ pub fn part_two(input: &str) -> Option<i64> {
 
     Some(extrapolations.iter().sum())
 }
-
 
 #[cfg(test)]
 mod tests {

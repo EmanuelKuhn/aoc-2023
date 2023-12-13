@@ -9,21 +9,20 @@ use crate::HandType::*;
 
 advent_of_code::solution!(7);
 
-
 #[derive(PartialEq, PartialOrd, Debug, Eq, Ord, Hash)]
 enum HandType {
     HighCard,
     OnePair,
     TwoPair,
     ThreeOfAKind,
-    FullHouse ,
+    FullHouse,
     FourOfAKind,
     FiveOfAKind,
 }
 
 fn compute_hand_type(cards: &str) -> HandType {
     let cards_counter = cards.chars().collect::<Counter<_>>().most_common_ordered();
-    
+
     let n_unique_cards = cards_counter.len();
 
     assert!(n_unique_cards <= 5);
@@ -35,15 +34,15 @@ fn compute_hand_type(cards: &str) -> HandType {
         3 => match cards_counter[0].1 {
             3 => ThreeOfAKind,
             2 => TwoPair,
-            _ => unreachable!()
+            _ => unreachable!(),
         },
         2 => match cards_counter[0].1 {
             3 => FullHouse,
             4 => FourOfAKind,
-            _ => unreachable!()
+            _ => unreachable!(),
         },
         1 => FiveOfAKind,
-        0 | 6.. => unreachable!()
+        0 | 6.. => unreachable!(),
     }
 }
 
@@ -57,8 +56,8 @@ fn compute_hand_type_joker(cards: &str) -> HandType {
         Some(n) => {
             let most_common_card = cards_counter.most_common_ordered().first().unwrap().0;
             cards_counter[&most_common_card] += n;
-        },
-        None => ()
+        }
+        None => (),
     }
 
     let cards_counter = cards_counter.most_common_ordered();
@@ -74,15 +73,15 @@ fn compute_hand_type_joker(cards: &str) -> HandType {
         3 => match cards_counter[0].1 {
             3 => ThreeOfAKind,
             2 => TwoPair,
-            _ => unreachable!()
+            _ => unreachable!(),
         },
         2 => match cards_counter[0].1 {
             3 => FullHouse,
             4 => FourOfAKind,
-            _ => unreachable!()
+            _ => unreachable!(),
         },
         1 => FiveOfAKind,
-        0 | 6.. => unreachable!()
+        0 | 6.. => unreachable!(),
     }
 }
 
@@ -90,10 +89,10 @@ fn compute_hand_type_joker(cards: &str) -> HandType {
 struct Hand<'a> {
     cards: &'a str,
     value: u64,
-    card_order: &'a str
+    card_order: &'a str,
 }
 
-static  CARD_ORDER: &str = "AKQJT98765432";
+static CARD_ORDER: &str = "AKQJT98765432";
 static CARD_ORDER_JOKER: &str = "AKQT98765432J";
 
 impl Ord for Hand<'_> {
@@ -103,9 +102,9 @@ impl Ord for Hand<'_> {
             let cb_strength = self.card_order.find(cb).expect("did not find card");
 
             if ca_strength < cb_strength {
-                return Ordering::Greater
+                return Ordering::Greater;
             } else if cb_strength < ca_strength {
-                return Ordering::Less
+                return Ordering::Less;
             }
         }
 
@@ -113,13 +112,11 @@ impl Ord for Hand<'_> {
     }
 }
 
-
 impl PartialOrd for Hand<'_> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
-
 
 impl PartialEq for Hand<'_> {
     fn eq(&self, other: &Self) -> bool {
@@ -131,7 +128,7 @@ impl Eq for Hand<'_> {}
 
 pub fn part_one(input: &str) -> Option<u32> {
     let hands: Vec<(&str, u64)> = parse_hands(&input);
-    
+
     let mut map_by_type: BTreeMap<HandType, BinaryHeap<Hand>> = BTreeMap::new();
 
     for (cards, value) in &hands {
@@ -139,7 +136,11 @@ pub fn part_one(input: &str) -> Option<u32> {
 
         let entry = map_by_type.entry(hand_type).or_default();
 
-        entry.push(Hand {cards: cards, value: *value, card_order: CARD_ORDER });
+        entry.push(Hand {
+            cards: cards,
+            value: *value,
+            card_order: CARD_ORDER,
+        });
     }
 
     let mut ranked_hands: Vec<Hand> = Vec::new();
@@ -148,20 +149,22 @@ pub fn part_one(input: &str) -> Option<u32> {
         ranked_hands.append(&mut hands.into_sorted_vec());
     }
 
-    Some(ranked_hands.iter()
-                .enumerate()
-                .map(|(i, hand)| (i + 1) as u32 * hand.value as u32)
-                .sum())
+    Some(
+        ranked_hands
+            .iter()
+            .enumerate()
+            .map(|(i, hand)| (i + 1) as u32 * hand.value as u32)
+            .sum(),
+    )
 }
 
 fn parse_hands(input: &str) -> Vec<(&str, u64)> {
     let mut hands = Vec::new();
-    
+
     for line in input.lines() {
         let tuple: Vec<&str> = line.split_ascii_whitespace().collect();
 
         hands.push((tuple[0], tuple[1].parse().expect("failed to parse value")));
-        
     }
 
     hands
@@ -169,7 +172,7 @@ fn parse_hands(input: &str) -> Vec<(&str, u64)> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let hands: Vec<(&str, u64)> = parse_hands(&input);
-    
+
     let mut map_by_type: BTreeMap<HandType, BinaryHeap<Hand>> = BTreeMap::new();
 
     for (cards, value) in &hands {
@@ -177,7 +180,11 @@ pub fn part_two(input: &str) -> Option<u32> {
 
         let entry = map_by_type.entry(hand_type).or_default();
 
-        entry.push(Hand {cards: cards, value: *value, card_order: CARD_ORDER_JOKER });
+        entry.push(Hand {
+            cards: cards,
+            value: *value,
+            card_order: CARD_ORDER_JOKER,
+        });
     }
 
     let mut ranked_hands: Vec<Hand> = Vec::new();
@@ -193,7 +200,6 @@ pub fn part_two(input: &str) -> Option<u32> {
     }
 
     Some(result)
-
 }
 
 #[cfg(test)]

@@ -1,12 +1,14 @@
 advent_of_code::solution!(2);
 
-use std::{str::FromStr, fmt::{self}, collections::HashMap};
-
+use std::{
+    collections::HashMap,
+    fmt::{self},
+    str::FromStr,
+};
 
 // type Map<T1, T2> = BTreeMap<Vec<T1>, T2>
 
 fn verify_game(game: &Game) -> bool {
-
     let constraints = [("red", 12), ("green", 13), ("blue", 14)];
 
     for set in &game.records {
@@ -14,14 +16,14 @@ fn verify_game(game: &Game) -> bool {
             for (constraint_item, max) in constraints {
                 if item == constraint_item {
                     if cnt > &max {
-                        return false
+                        return false;
                     }
                 }
             }
         }
     }
 
-    return true
+    return true;
 }
 
 fn power_of_game(game: &Game) -> u32 {
@@ -41,17 +43,16 @@ fn power_of_game(game: &Game) -> u32 {
 #[derive(Debug, PartialEq)]
 struct Game {
     id: u32,
-    records: Vec<Vec<(String, u32)>>
+    records: Vec<Vec<(String, u32)>>,
 }
-
 
 #[derive(Debug)]
 pub enum MyCustomError {
-  ParseError,
-  ParseIntError,
+    ParseError,
+    ParseIntError,
 }
 
-impl From<std::num::ParseIntError> for MyCustomError{
+impl From<std::num::ParseIntError> for MyCustomError {
     fn from(_value: std::num::ParseIntError) -> Self {
         MyCustomError::ParseIntError
     }
@@ -60,12 +61,12 @@ impl From<std::num::ParseIntError> for MyCustomError{
 impl std::error::Error for MyCustomError {}
 
 impl fmt::Display for MyCustomError {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    match self {
-      MyCustomError::ParseError => write!(f, "Parse Error"),
-      MyCustomError::ParseIntError => write!(f, "Parse Int Error")
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            MyCustomError::ParseError => write!(f, "Parse Error"),
+            MyCustomError::ParseIntError => write!(f, "Parse Int Error"),
+        }
     }
-  }
 }
 
 impl FromStr for Game {
@@ -75,14 +76,13 @@ impl FromStr for Game {
     // Parses a color hex code of the form '#rRgGbB..' into an
     // instance of 'RGB'
     fn from_str(line: &str) -> Result<Self, Self::Err> {
-
         let colon_location = line.find(":").ok_or_else(|| MyCustomError::ParseError)?;
 
         let game_id_string = &line[5..colon_location];
 
         let game_id = game_id_string.parse::<u32>()?;
 
-        let sets_string = &line[colon_location+1..];
+        let sets_string = &line[colon_location + 1..];
 
         let mut records = vec![];
 
@@ -92,7 +92,10 @@ impl FromStr for Game {
             records.push(set);
         }
 
-        Ok(Game { id: game_id, records: records })
+        Ok(Game {
+            id: game_id,
+            records: records,
+        })
     }
 }
 
@@ -100,7 +103,7 @@ impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Game {}: {:?}", self.id, self.records)
     }
-  }
+}
 
 fn parse_set(set_description: &str) -> Result<Vec<(String, u32)>, MyCustomError> {
     // dbg!(set_description);
@@ -122,10 +125,9 @@ fn parse_set(set_description: &str) -> Result<Vec<(String, u32)>, MyCustomError>
 
         items.push((item.to_owned(), count));
     }
-    
+
     return Ok(items);
 }
-
 
 pub fn part_one(input: &str) -> Option<u32> {
     let mut verified_ids: Vec<u32> = vec![];
@@ -136,8 +138,8 @@ pub fn part_one(input: &str) -> Option<u32> {
                 if verify_game(&game) {
                     verified_ids.push(game.id)
                 }
-            },
-            Err(e) => println!("Failed to parse: {}", e)
+            }
+            Err(e) => println!("Failed to parse: {}", e),
         }
     }
 
@@ -151,8 +153,8 @@ pub fn part_two(input: &str) -> Option<u32> {
         match line.parse::<Game>() {
             Ok(game) => {
                 sum_of_powers += power_of_game(&game);
-            },
-            Err(e) => println!("Failed to parse: {}", e)
+            }
+            Err(e) => println!("Failed to parse: {}", e),
         }
     }
 
@@ -193,15 +195,21 @@ mod tests {
         // assert_eq!(game.unwrap().id, 100)
 
         let game = game.unwrap();
-        
-        let expected = vec![make_expected_map(vec![("blue", 3), ("red", 4)]), 
-        make_expected_map(vec![("red", 1), ("green", 2), ("blue", 6)]), make_expected_map(vec![("green", 2)])];
+
+        let expected = vec![
+            make_expected_map(vec![("blue", 3), ("red", 4)]),
+            make_expected_map(vec![("red", 1), ("green", 2), ("blue", 6)]),
+            make_expected_map(vec![("green", 2)]),
+        ];
 
         assert_eq!(game.records, expected);
     }
 
     fn make_expected_map(mapping: Vec<(&str, u32)>) -> Vec<(String, u32)> {
-        return mapping.iter().map(|(item, cnt)| (item.to_string().to_owned(), cnt.to_owned())).collect();
+        return mapping
+            .iter()
+            .map(|(item, cnt)| (item.to_string().to_owned(), cnt.to_owned()))
+            .collect();
     }
 
     #[test]
@@ -212,9 +220,8 @@ mod tests {
 
         let set = set.unwrap();
 
-        let expected: Vec<(String, u32)> = make_expected_map(vec![("red", 1), ("green", 2), ("blue", 6)]);
-        
-        
+        let expected: Vec<(String, u32)> =
+            make_expected_map(vec![("red", 1), ("green", 2), ("blue", 6)]);
 
         assert_eq!(set, expected);
     }
